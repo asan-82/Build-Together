@@ -1,0 +1,22 @@
+{
+  "name": "build-together",
+  "version": "1.0.0",
+  "description": "platform for developers to connect",
+  "main": "index.js",
+  "scripts": {
+    "dev":  "nodemon src/app.js",
+    "start":"node src/app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "js",
+    "node",
+    "react"
+  ],
+  "author": "\"Aarushi Dhruv\"",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.1.0",
+    "nodemon": "^3.1.10"
+  }
+}
