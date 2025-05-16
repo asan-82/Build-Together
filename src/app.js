@@ -2,7 +2,7 @@ const express=require("express");
 const app=express();
 
 app.use("/text",(req,res)=>{
-    res.send("world");
+    res.send("hey world");
 })
 
 app.use((req,res)=>{
