@@ -1,24 +1,16 @@
 const express=require("express");
+const connectDB=require("./config/database.js");
 const app=express();
 
 
-app.use("/text",(req,res,next)=>{
-    console.log("bleh");
-    res.send("hey world");
-    next();
-}, (req,res)=>{
-    console.log("blah");
-res.send("hey2 world");
-});
-app.use("/abc/:id",(req,res)=>{
-    console.log(req.params);
-    res.send("aaru");
-})
-app.use((req,res)=>{
-    res.send("hello world");
-})
-
-
+connectDB().then(()=>{
+console.log("db connection established");
 app.listen(3000,()=>{
     console.log("listning on port 3000");
 })
+}).catch((err)=>{
+console.error("db connection cannot be established");
+});
+
+   
+
