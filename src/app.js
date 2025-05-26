@@ -4,6 +4,28 @@ const User = require('./models/user');
 const app=express();
 
 app.use(express.json());
+
+app.get("/users",(req,res)=>{
+    const email = req.body.emailId;
+    User.findOne({ emailId: email })
+        .then(users => res.send(users))
+        .catch(err => res.status(500).send("Error fetching users: " + err.message));
+})
+
+app.delete("/users",async (req,res)=>{
+    const id=req.body._id;
+   
+    try{
+        await User.deleteOne({_id:id});
+       res.send("Deleted successfully");
+
+    }
+    catch(err){
+        res.status(400).send("error occured");
+    }
+
+})
+    
 app.post("/signup",async (req,res)=>{
     console.log(req.body);
    /* const userObj={
