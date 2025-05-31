@@ -1,6 +1,7 @@
 const express=require("express");
 const connectDB=require("./config/database.js");
 const User = require('./models/user');
+const { ReturnDocument } = require("mongodb");
 const app=express();
 
 app.use(express.json());
@@ -11,7 +12,32 @@ app.get("/users",(req,res)=>{
         .then(users => res.send(users))
         .catch(err => res.status(500).send("Error fetching users: " + err.message));
 })
-
+app.patch("/users/:userId",async (req,res)=>{
+    const userId=req.params.userId;
+    var data=req.body;
+    
+    try{
+        const ALLOWED_UPDATES=["skills","photoUrl","gender","age","password"];
+        const isUpdateAllowed=Object.keys(data).every((k)=>
+        ALLOWED_UPDATES.includes(k));
+        if(!isUpdateAllowed)
+        {
+            //console.log(Error);
+            throw new Error("Update not allowed");
+            
+        }
+        if(data.skills.length>10)
+        {
+            throw new Error("Skills cannot exceed the length of 10");
+        }
+    const changed=await User.findByIdAndUpdate(userId,data,{returnDocument:"after"});
+    res.send({ message: "User updated successfully" });
+    }
+    catch(err)
+    {
+        res.status(400).send(err);
+    }
+})
 app.delete("/users",async (req,res)=>{
     const id=req.body._id;
    
