@@ -2,6 +2,7 @@ const express=require("express");
 const connectDB=require("./config/database.js");
 const User = require('./models/user');
 const { ReturnDocument } = require("mongodb");
+const { validateReqBody } = require('../src/utils/validator.js');
 const app=express();
 
 app.use(express.json());
@@ -61,12 +62,14 @@ app.post("/signup",async (req,res)=>{
         "password":"aarushi@123"
     }
         */
+
     const user=new User(req.body);
   try{
+    validateReqBody(req);
     await user.save();
    res.send("User added successfully!");
   }catch(err){
-res.status(400).send("Error saving the user"+err.message);
+res.status(400).send("Error saving the user "+err.message);
   }
 }
 )
