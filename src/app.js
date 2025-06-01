@@ -3,6 +3,8 @@ const connectDB=require("./config/database.js");
 const User = require('./models/user');
 const { ReturnDocument } = require("mongodb");
 const { validateReqBody } = require('../src/utils/validator.js');
+const bcrypt = require('bcrypt');
+
 const app=express();
 
 app.use(express.json());
@@ -54,7 +56,8 @@ app.delete("/users",async (req,res)=>{
 })
     
 app.post("/signup",async (req,res)=>{
-    console.log(req.body);
+    console.log("Signup route hit");
+   // console.log(req.body);
    /* const userObj={
         "firstName":"Aarushi",
         "lastName":"Dhruv",
@@ -62,10 +65,17 @@ app.post("/signup",async (req,res)=>{
         "password":"aarushi@123"
     }
         */
-
-    const user=new User(req.body);
   try{
     validateReqBody(req);
+    const {firstName,lastName,emailId,password}=req.body;
+  const hashedPassword=await bcrypt.hash(password, 10);
+  console.log(hashedPassword);
+  const user=new User({
+    firstName,
+    lastName,
+    emailId,
+    password: hashedPassword
+  });
     await user.save();
    res.send("User added successfully!");
   }catch(err){
