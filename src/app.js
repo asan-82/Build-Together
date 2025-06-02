@@ -6,6 +6,7 @@ const { validateReqBody } = require("../src/utils/validator.js");
 const bcrypt = require("bcrypt");
 const cookieParser=require("cookie-parser");
 const jwt=require("jsonwebtoken");
+const {userAuth}=require("../src/middlewares/auth.js");
 
 const app = express();
 
@@ -50,22 +51,12 @@ app.post("/login", async (req, res) => {
     res.status(400).send("ERROR: " + err.message);
   }
 });
-app.get("/profile", async (req,res)=>{
+app.get("/profile",userAuth, async (req,res)=>{
     try{
-const cookies=req.cookies;
-const {token}=cookies;
-if(!token)
-{
-    throw new Error("Invalid Token");
-}
-const decodedMessage=await jwt.verify(token,"Abracadabara@12345")
-const {_id}=decodedMessage;
-if(!_id)
-{
-    throw new Error("User doesn't exist")
-}
-console.log("heyyyyy"+_id);
-res.send("reading cookies");
+
+const user=req.user;
+res.send(user);
+
     }
     catch(err)
     {
