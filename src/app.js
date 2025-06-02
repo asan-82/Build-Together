@@ -4,10 +4,13 @@ const User = require("./models/user");
 const { ReturnDocument } = require("mongodb");
 const { validateReqBody } = require("../src/utils/validator.js");
 const bcrypt = require("bcrypt");
+const cookieParser=require("cookie-parser");
+const jwt=require("jsonwebtoken");
 
 const app = express();
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.post("/signup", async (req, res) => {
   try {
@@ -29,23 +32,46 @@ app.post("/signup", async (req, res) => {
 });
 app.post("/login", async (req, res) => {
   try {
+    const { emailId, password } = req.body;
+    const user = await User.findOne({ emailId: emailId });
+    if (!user) {
+      throw new Error("Invalid Credentials");
+    }
+    const isPasswordValid = await bcrypt.compare(password, user.password);
     
-const {emailId,password}=req.body;
-const user=await User.findOne({emailId:emailId});
-if(!user)
-{
-     throw new Error("Invalid Credentials");
-}
-    const isPasswordValid= await bcrypt.compare(password, user.password);
-    if(isPasswordValid)
-        res.send("Login Successful!!!");
-    else
-    throw new Error("Invalid Credentials");
-
+    if (isPasswordValid) 
+        {
+            const token= await jwt.sign({_id:user._id},"Abracadabara@12345")
+            console.log(token);
+            res.cookie("token",token);
+            res.send("Login Successful!!!");
+        }else throw new Error("Invalid Credentials");
   } catch (err) {
     res.status(400).send("ERROR: " + err.message);
   }
 });
+app.get("/profile", async (req,res)=>{
+    try{
+const cookies=req.cookies;
+const {token}=cookies;
+if(!token)
+{
+    throw new Error("Invalid Token");
+}
+const decodedMessage=await jwt.verify(token,"Abracadabara@12345")
+const {_id}=decodedMessage;
+if(!_id)
+{
+    throw new Error("User doesn't exist")
+}
+console.log("heyyyyy"+_id);
+res.send("reading cookies");
+    }
+    catch(err)
+    {
+res.status(400).send("ERROR: " + err.message);
+    }
+})
 app.get("/users", (req, res) => {
   const email = req.body.emailId;
   User.findOne({ emailId: email })
