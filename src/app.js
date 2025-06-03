@@ -42,7 +42,9 @@ app.post("/login", async (req, res) => {
     
     if (isPasswordValid) 
         {
-            const token= await jwt.sign({_id:user._id},"Abracadabara@12345")
+            const token= await jwt.sign({_id:user._id},"Abracadabara@12345",{
+                expiresIn:"7d",
+            })
             console.log(token);
             res.cookie("token",token);
             res.send("Login Successful!!!");
