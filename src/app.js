@@ -5,7 +5,6 @@ const { ReturnDocument } = require("mongodb");
 const { validateReqBody } = require("../src/utils/validator.js");
 const bcrypt = require("bcrypt");
 const cookieParser=require("cookie-parser");
-const jwt=require("jsonwebtoken");
 const {userAuth}=require("../src/middlewares/auth.js");
 
 const app = express();
@@ -38,13 +37,11 @@ app.post("/login", async (req, res) => {
     if (!user) {
       throw new Error("Invalid Credentials");
     }
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = await user.verifyPassword(password);
     
     if (isPasswordValid) 
         {
-            const token= await jwt.sign({_id:user._id},"Abracadabara@12345",{
-                expiresIn:"7d",
-            })
+            const token= await user.getJWT();
             console.log(token);
             res.cookie("token",token);
             res.send("Login Successful!!!");
