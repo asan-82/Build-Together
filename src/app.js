@@ -1,67 +1,24 @@
 const express = require("express");
 const connectDB = require("./config/database.js");
-const User = require("./models/user");
+
 const { ReturnDocument } = require("mongodb");
-const { validateReqBody } = require("../src/utils/validator.js");
-const bcrypt = require("bcrypt");
+
+
 const cookieParser=require("cookie-parser");
-const {userAuth}=require("../src/middlewares/auth.js");
 
 const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
 
-app.post("/signup", async (req, res) => {
-  try {
-    validateReqBody(req);
-    const { firstName, lastName, emailId, password } = req.body;
-    const hashedPassword = await bcrypt.hash(password, 10);
-    console.log(hashedPassword);
-    const user = new User({
-      firstName,
-      lastName,
-      emailId,
-      password: hashedPassword,
-    });
-    await user.save();
-    res.send("User added successfully!");
-  } catch (err) {
-    res.status(400).send("Error saving the user " + err.message);
-  }
-});
-app.post("/login", async (req, res) => {
-  try {
-    const { emailId, password } = req.body;
-    const user = await User.findOne({ emailId: emailId });
-    if (!user) {
-      throw new Error("Invalid Credentials");
-    }
-    const isPasswordValid = await user.verifyPassword(password);
-    
-    if (isPasswordValid) 
-        {
-            const token= await user.getJWT();
-            console.log(token);
-            res.cookie("token",token);
-            res.send("Login Successful!!!");
-        }else throw new Error("Invalid Credentials");
-  } catch (err) {
-    res.status(400).send("ERROR: " + err.message);
-  }
-});
-app.get("/profile",userAuth, async (req,res)=>{
-    try{
+const authRouter=require("./routes/authRouter.js");
+const profileRouter=require("../src/routes/profile.js");
+const requestsRouter=require("../src/routes/requests.js");
 
-const user=req.user;
-res.send(user);
+app.use("/",authRouter);
+app.use("/",profileRouter);
+app.use("/",requestsRouter);
 
-    }
-    catch(err)
-    {
-res.status(400).send("ERROR: " + err.message);
-    }
-})
 app.get("/users", (req, res) => {
   const email = req.body.emailId;
   User.findOne({ emailId: email })
