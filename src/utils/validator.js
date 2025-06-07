@@ -16,6 +16,11 @@ const validateReqBody=(req)=>{
         throw new Error("Provide correct password");
     }
 }
+const validateEditProfileData=(req)=>{
+    const allowedEditFields=["lastName","firstName","about","age","skills","emailId","photoUrl"];
+   const isEditAllowed= Object.keys(req.body).every(field => allowedEditFields.includes(field));
+   return isEditAllowed;
+}
 module.exports={
-validateReqBody
+validateReqBody,validateEditProfileData
 }
