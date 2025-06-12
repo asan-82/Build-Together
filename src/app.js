@@ -19,14 +19,7 @@ app.use("/",authRouter);
 app.use("/",profileRouter);
 app.use("/",requestsRouter);
 
-app.get("/users", (req, res) => {
-  const email = req.body.emailId;
-  User.findOne({ emailId: email })
-    .then((users) => res.send(users))
-    .catch((err) =>
-      res.status(500).send("Error fetching users: " + err.message)
-    );
-});
+
 app.patch("/users/:userId", async (req, res) => {
   const userId = req.params.userId;
   var data = req.body;

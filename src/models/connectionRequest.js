@@ -12,14 +12,16 @@ const connectionRequestSchema=new mongoose.Schema({
         status: {
             type:String,
             enum:{
-                values:["Interested","Ignored","Accepted","Rejected"],
-                message:`${value} is incorrect status type`
+                values:["interested","ignored","accepted","rejected"],
+                message: props => "${props.value} is incorrect status type"
             }
         }
 },
 {
 timestamps:true
-})
+});
+
+connectionRequestSchema.index({senderUserId:1,receiverUserId:1});
 
 const connectionRequestModel=new mongoose.model("ConnectionRequest",connectionRequestSchema)
 

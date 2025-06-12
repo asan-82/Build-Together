@@ -32,6 +32,8 @@ const userSchema =new mongoose.Schema({
     timestamps:true,
 });
 
+userSchema.index({firstName:1,lastName:1});
+
 userSchema.methods.verifyPassword=async function(passwordEnteredByUser){
     const user=this;
     const passwordHash=user.password;
