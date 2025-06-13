@@ -4,6 +4,7 @@ const router=express.Router();
 const User = require("../models/user");
 const {userAuth} = require("../middlewares/auth");
 const ConnectionRequest=require("../models/connectionRequest");
+const connectionRequestModel = require("../models/connectionRequest");
 
 router.post("/request/send/:status/:receiverUserId",userAuth,async (req,res)=>{
     
@@ -54,6 +55,39 @@ catch(err)
 {
     res.status(400).send(err);
 }
-})
+});
+router.post("/request/review/:status/:requestId",userAuth,async (req,res)=>{
+    
+    try{
+    const loggedInUser=req.user;
+    const {status,requestId}=req.params;
+console.log("hii");
+    const allowedStatus=["accepted","rejected"];
 
+    if(!allowedStatus.includes(status))
+    {
+      return res.status(400).json({message:"Invalid Status"});
+    }
+
+    const connectionRequestDoc=await ConnectionRequest.findOne({
+
+        _id:requestId,
+        receiverUserId: loggedInUser._id,
+       status:"interested",
+
+    });
+    if(!connectionRequestDoc)
+    {
+      return res.status(400).json({message:"Connection request not found!"});
+        
+    }
+    connectionRequestDoc.status=status;
+   const data= await connectionRequestDoc.save();
+  return res.json({message:"Connection Request: "+status,data});
+    }
+catch(err)
+{
+  return res.status(400).send(err);
+}
+});
 module.exports=router;
