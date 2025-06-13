@@ -4,7 +4,6 @@ const router=express.Router();
 const User = require("../models/user");
 const {userAuth} = require("../middlewares/auth");
 const ConnectionRequest=require("../models/connectionRequest");
-const connectionRequestModel = require("../models/connectionRequest");
 
 router.post("/request/send/:status/:receiverUserId",userAuth,async (req,res)=>{
     
